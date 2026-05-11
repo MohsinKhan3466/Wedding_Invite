@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shahid & Rozina - Reception</title>
+  
+  <!-- Tailwind CSS for Styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Premium Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Great+Vibes&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // SVG Icons
+    const MailOpen = ({ className }) => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 .8-1.6l8-6a2 2 0 0 1 2.4 0l8 6Z"/><path d="m22 10-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 10"/></svg>;
+    const Send = ({ className }) => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>;
+    const X = ({ className }) => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
+    const Music = ({ className }) => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>;
+    const Pause = ({ className }) => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>;
+    const MapPin = ({ className }) => <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>;
+
+    const BotanicalCorner = ({ className, flipped, top }) => (
+      <svg className={className} viewBox="0 0 200 250" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ transform: `${flipped ? 'scaleX(-1)' : ''} ${top ? 'scaleY(-1)' : ''}` }}>
+        <path d="M0 250 C 50 200, 20 100, 100 50" stroke="#7A8E72" strokeWidth="1.5" fill="none" opacity="0.7"/>
+        <path d="M0 250 C 80 220, 90 150, 150 120" stroke="#7A8E72" strokeWidth="1" fill="none" opacity="0.6"/>
+        <path d="M30 150 C 60 120, 80 80, 120 40" stroke="#B08D59" strokeWidth="1" fill="none" opacity="0.5"/>
+        <path d="M 20 250 C 20 180, 80 160, 120 120 C 90 180, 60 200, 50 250 Z" fill="#8A9E82" opacity="0.85"/>
+        <path d="M 50 250 C 50 200, 100 180, 150 160 C 110 200, 90 220, 80 250 Z" fill="#9CB294" opacity="0.9"/>
+        <path d="M 0 250 C 0 150, 40 100, 80 50 C 60 120, 30 160, 10 250 Z" fill="#6A7A62" opacity="0.8"/>
+        <path d="M 10 220 C 40 180, 80 190, 70 240 C 40 240, 20 230, 10 220 Z" fill="#997A4D" />
+        <path d="M 30 200 C 50 160, 80 170, 60 210 Z" fill="#755B37" />
+        <path d="M 50 220 C 80 190, 100 210, 70 240 Z" fill="#B08D59" />
+        <path d="M 10 180 C 40 140, 60 160, 40 190 Z" fill="#8A6E46" />
+        <circle cx="100" cy="50" r="4" fill="#997A4D" />
+        <circle cx="140" cy="110" r="3" fill="#755B37" />
+        <circle cx="110" cy="80" r="2.5" fill="#B08D59" />
+        <circle cx="70" cy="60" r="2" fill="#7A8E72" />
+      </svg>
+    );
+
+    const App = () => {
+      const [isOpen, setIsOpen] = useState(false);
+      const [isAnimating, setIsAnimating] = useState(false);
+      const [isPlaying, setIsPlaying] = useState(false);
+      const [showRsvpModal, setShowRsvpModal] = useState(false);
+      const [rsvpForm, setRsvpForm] = useState({ name: '', attending: 'yes', guests: '1', message: '' });
+      const audioRef = useRef(null);
+
+      const handleOpen = () => {
+        if (audioRef.current) {
+          audioRef.current.play().then(() => setIsPlaying(true)).catch(err => console.log(err));
+        }
+        setIsAnimating(true);
+        setTimeout(() => { setIsOpen(true); setIsAnimating(false); }, 700);
+      };
+
+      const toggleMusic = () => {
+        if (audioRef.current) {
+          if (isPlaying) { audioRef.current.pause(); setIsPlaying(false); } 
+          else { audioRef.current.play().then(() => setIsPlaying(true)); }
+        }
+      };
+
+      const handleRsvpSubmit = (e) => {
+        e.preventDefault();
+        const attendingText = rsvpForm.attending === 'yes' ? "Insha'Allah, Yes ✨" : 'Regretfully No 🌙';
+        let message = `*Assalamu Alaikum!* 🌙\n\n*RSVP for Shahid & Rozina's Reception*\n\n*Name:* ${rsvpForm.name}\n*Attending:* ${attendingText}\n`;
+        if (rsvpForm.attending === 'yes') message += `*Number of Guests:* ${rsvpForm.guests}\n`;
+        
+        const whatsappUrl = `https://wa.me/919028207772?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+        setShowRsvpModal(false);
+      };
+
+      return (
+        <div className="min-h-screen bg-stone-300 py-6 sm:py-10 flex items-center justify-center font-['Cormorant_Garamond'] overflow-hidden relative selection:bg-[#762527] selection:text-white">
+          <audio ref={audioRef} loop src="./jashn_e_bahara_instr.mp3" />
+
+          {isOpen && (
+            <button onClick={toggleMusic} className="fixed bottom-6 right-6 z-50 bg-[#F7F3EB] border border-[#B08D59] text-[#762527] p-3.5 rounded-full shadow-lg hover:scale-105 transition-transform animate-fade-in">
+              {isPlaying ? <Music className="w-5 h-5 animate-pulse" /> : <Pause className="w-5 h-5" />}
+            </button>
+          )}
+
+          <div className={`max-w-[420px] w-full min-h-[850px] bg-[#F7F3EB] shadow-2xl relative transition-all duration-700 ease-in-out transform ${isAnimating ? 'scale-95 opacity-0 -translate-y-4' : 'scale-100 opacity-100 translate-y-0'} mx-4 sm:mx-0 overflow-hidden`}>
+            <div className="absolute inset-0 opacity-[0.4] pointer-events-none mix-blend-multiply" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
+
+            {isOpen && (
+              <>
+                <div className="absolute top-10 left-6 right-6 bottom-0 border-[1.5px] border-[#B08D59] rounded-t-[200px] border-b-0 pointer-events-none z-10 opacity-80"></div>
+                <div className="absolute top-12 left-[30px] right-[30px] bottom-0 border border-[#B08D59] rounded-t-[200px] border-b-0 pointer-events-none z-10 opacity-60"></div>
+                <BotanicalCorner className="absolute bottom-0 left-0 w-36 h-48 pointer-events-none z-20" />
+                <BotanicalCorner className="absolute bottom-0 right-0 w-36 h-48 pointer-events-none z-20" flipped />
+                <BotanicalCorner className="absolute top-1/2 left-0 w-24 h-32 -translate-y-1/2 -translate-x-4 pointer-events-none z-20 opacity-70" top />
+                <BotanicalCorner className="absolute top-1/2 right-0 w-24 h-32 -translate-y-1/2 translate-x-4 pointer-events-none z-20 opacity-70" flipped top />
+              </>
+            )}
+
+            {!isOpen ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-8 z-30">
+                <BotanicalCorner className="absolute top-0 left-0 w-40 h-56 pointer-events-none opacity-80" top />
+                <BotanicalCorner className="absolute bottom-0 right-0 w-40 h-56 pointer-events-none opacity-80" flipped />
+                
+                <div className="text-center bg-[#F7F3EB]/60 backdrop-blur-sm p-8 rounded-2xl border border-[#B08D59]/30 shadow-lg">
+                  <h2 className="font-['Great_Vibes'] text-5xl text-[#762527] mb-6 drop-shadow-sm">Invitation</h2>
+                  <div className="flex flex-col items-center gap-2 mb-8">
+                    <h1 className="font-['Great_Vibes'] text-4xl text-[#762527]">Shahid</h1>
+                    <span className="font-['Cinzel'] text-sm tracking-widest text-[#B08D59] font-bold">WEDS</span>
+                    <h1 className="font-['Great_Vibes'] text-4xl text-[#762527]">Rozina</h1>
+                  </div>
+                  <p className="font-['Cinzel'] text-xs font-bold tracking-widest text-[#5A483E] mb-8">25TH MAY 2026</p>
+                  <button onClick={handleOpen} className="group flex items-center justify-center gap-2 bg-[#762527] text-[#F7F3EB] px-8 py-3 rounded-md shadow-md hover:bg-[#5A1C1E] transition-all hover:scale-105">
+                    <MailOpen className="w-5 h-5 text-[#B08D59]" />
+                    <span className="font-['Cinzel'] tracking-widest text-sm font-bold">OPEN INVITE</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="absolute inset-0 flex flex-col pt-16 pb-10 px-10 text-center z-30 overflow-y-auto">
+                <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                  <p className="font-['Cormorant_Garamond'] text-[15px] text-[#5A483E] font-medium tracking-wide mb-1">In the name of Allah,</p>
+                  <p className="font-['Cormorant_Garamond'] text-[15px] text-[#5A483E] font-medium tracking-wide mb-6">The most beneficent & most merciful</p>
+                  <h3 className="font-['Cinzel'] font-bold text-[13px] tracking-widest text-[#762527] mb-3">MR. & MRS. ASIF SHAH</h3>
+                  <p className="font-['Cormorant_Garamond'] text-base text-[#5A483E] italic leading-relaxed px-2">request the pleasure of your company &<br/>blessings to celebrate the Reception<br/>of their beloved son</p>
+                </div>
+
+                <div className="my-8 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+                  <h1 className="font-['Great_Vibes'] text-5xl sm:text-[3.5rem] text-[#762527] leading-none mb-1 drop-shadow-sm">Shahid Shah</h1>
+                  <div className="flex items-center justify-center gap-3 my-3">
+                    <span className="font-['Cormorant_Garamond'] italic text-lg text-[#B08D59]">with</span>
+                  </div>
+                  <h1 className="font-['Great_Vibes'] text-5xl sm:text-[3.5rem] text-[#762527] leading-none mb-2 drop-shadow-sm">Rozina Bee</h1>
+                  <p className="font-['Cormorant_Garamond'] font-semibold text-sm text-[#5A483E]">(D/o. Salim Shah Sahab)</p>
+                </div>
+
+                <div className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+                  <p className="font-['Cinzel'] text-[11px] font-bold tracking-[0.2em] text-[#762527] underline underline-offset-4 mb-4">INSHA ALLAH</p>
+                  <h2 className="font-['Great_Vibes'] text-3xl text-[#762527] mb-5">Reception Ceremony</h2>
+                  <p className="font-['Cinzel'] text-[13px] font-bold tracking-widest text-[#5A483E] mb-4">ON MONDAY, 25TH MAY 2026</p>
+                  <div className="font-['Cormorant_Garamond'] text-base text-[#5A483E] font-semibold mb-6">
+                    <p>Reception - 7:00 pm Onwards</p>
+                    <p className="text-sm font-normal italic">(After Namaz-e-Maghrib)</p>
+                  </div>
+                  <div className="mb-6">
+                    <p className="font-['Cinzel'] text-xs font-bold tracking-widest text-[#762527] mb-2">VENUE</p>
+                    <p className="font-['Cormorant_Garamond'] text-[15px] font-bold text-[#5A483E]">ALHAJ SATTAR HALL,</p>
+                    <p className="font-['Cormorant_Garamond'] text-[15px] text-[#5A483E]">Washim Road, Akola.</p>
+                  </div>
+                  <div className="mb-8">
+                    <p className="font-['Cormorant_Garamond'] text-[15px] italic text-[#B08D59] mb-2">With Best Wishes,</p>
+                    <p className="font-['Cormorant_Garamond'] text-sm font-bold text-[#5A483E] leading-relaxed">Arif Shah,<br/>Rizwan Shah,<br/>Tousif Shah.</p>
+                  </div>
+
+                  <div className="flex flex-col gap-3 pb-8 z-40 relative px-2">
+                    <button onClick={() => setShowRsvpModal(true)} className="w-full bg-[#762527] border border-[#762527] text-[#F7F3EB] px-4 py-3 rounded-full font-['Cinzel'] text-[11px] tracking-widest font-bold hover:bg-transparent hover:text-[#762527] transition-colors flex items-center justify-center gap-2">
+                      <Send className="w-3.5 h-3.5" /> PLEASE CONFIRM YOUR PRESENCE
+                    </button>
+                    <a href="https://maps.app.goo.gl/zYEcSDom5tWgbkeB9" target="_blank" rel="noopener noreferrer" className="w-full bg-transparent border border-[#B08D59] text-[#762527] px-4 py-3 rounded-full font-['Cinzel'] text-[11px] tracking-widest font-bold hover:bg-[#B08D59] hover:text-[#F7F3EB] transition-colors flex items-center justify-center gap-2">
+                      <MapPin className="w-3.5 h-3.5" /> GET DIRECTIONS
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {showRsvpModal && (
+            <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-fade-in">
+              <div className="bg-[#F7F3EB] w-full max-w-sm rounded-xl shadow-2xl relative border border-[#B08D59] overflow-hidden">
+                <div className="bg-[#762527] py-4 px-6 flex justify-between items-center text-[#F7F3EB]">
+                  <h2 className="font-['Cinzel'] font-bold tracking-widest text-sm text-[#B08D59]">PLEASE CONFIRM</h2>
+                  <button onClick={() => setShowRsvpModal(false)} className="text-[#B08D59] hover:text-white transition-colors"><X className="w-5 h-5" /></button>
+                </div>
+                <div className="p-6 relative">
+                  <form onSubmit={handleRsvpSubmit} className="space-y-5">
+                    <div>
+                      <label className="block font-['Cinzel'] text-xs font-bold text-[#762527] mb-1">Full Name</label>
+                      <input type="text" required className="w-full px-3 py-2 bg-transparent border-b border-[#B08D59] focus:border-[#762527] outline-none text-sm font-['Cormorant_Garamond'] italic" placeholder="Your name" value={rsvpForm.name} onChange={(e) => setRsvpForm({...rsvpForm, name: e.target.value})} />
+                    </div>
+                    <div>
+                      <label className="block font-['Cinzel'] text-xs font-bold text-[#762527] mb-2">Attending?</label>
+                      <div className="flex gap-3">
+                        <label className="flex-1 cursor-pointer">
+                          <input type="radio" name="attending" value="yes" checked={rsvpForm.attending === 'yes'} onChange={(e) => setRsvpForm({...rsvpForm, attending: e.target.value})} className="peer sr-only"/>
+                          <div className="text-center py-2 px-1 border border-[#B08D59] rounded text-[11px] font-['Cinzel'] font-bold tracking-wide peer-checked:bg-[#762527] peer-checked:text-[#F7F3EB] transition-colors">Insha'Allah, Yes</div>
+                        </label>
+                        <label className="flex-1 cursor-pointer">
+                          <input type="radio" name="attending" value="no" checked={rsvpForm.attending === 'no'} onChange={(e) => setRsvpForm({...rsvpForm, attending: e.target.value})} className="peer sr-only" />
+                          <div className="text-center py-2 px-1 border border-[#B08D59] rounded text-[11px] font-['Cinzel'] font-bold tracking-wide peer-checked:bg-[#5A483E] peer-checked:text-[#F7F3EB] transition-colors">Regretfully No</div>
+                        </label>
+                      </div>
+                    </div>
+                    {rsvpForm.attending === 'yes' && (
+                      <div>
+                        <label className="block font-['Cinzel'] text-xs font-bold text-[#762527] mb-1">Guests</label>
+                        <select className="w-full px-3 py-2 bg-transparent border-b border-[#B08D59] outline-none text-sm font-['Cormorant_Garamond']" value={rsvpForm.guests} onChange={(e) => setRsvpForm({...rsvpForm, guests: e.target.value})}>
+                          {[1, 2, 3, 4, 5].map(num => <option key={num} value={num}>{num}</option>)}
+                        </select>
+                      </div>
+                    )}
+                    <button type="submit" className="w-full py-3 mt-4 bg-[#762527] text-[#F7F3EB] rounded font-['Cinzel'] font-bold tracking-widest text-[11px] flex items-center justify-center gap-2">
+                      <Send className="w-3.5 h-3.5" /> SEND VIA WHATSAPP
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; }
+            .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+            ::-webkit-scrollbar { width: 4px; }
+            ::-webkit-scrollbar-track { background: transparent; }
+            ::-webkit-scrollbar-thumb { background: #B08D59; border-radius: 4px; }
+          `}} />
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
